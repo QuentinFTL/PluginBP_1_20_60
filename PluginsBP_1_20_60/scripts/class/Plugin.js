@@ -69,8 +69,9 @@ export class Plugin {
     deps(deps_) {
         let misses = [];
         let shouldStop = false;
-        if(misses.length > 0) {
-            this.missingDependencies(shouldStop, misses);
+
+        if(typeof deps_ == "string") {
+            this.deps([deps_]);
             return;
         }
 
@@ -93,6 +94,25 @@ export class Plugin {
             
         }
 
+        if(misses.length > 0) {
+            this.missingDependencies(shouldStop, misses);
+            return;
+        }
+
+    }
+
+    hasDependency(dep) {
+        return (globalThis[dep] != undefined && system.pluginMgr.isPluginEnabled(dep));
+    }
+
+    hasDependencies(deps) {
+        let has = true;
+        for (let i = 0; i < deps.length; i++) {
+            has = has && this.hasDependency(deps[i]);
+            console.log("has:" +has);
+            
+        }
+        return has;
     }
 
     missingDependencies(shouldStop, deps) {

@@ -18,7 +18,7 @@ export default class WorldEdit extends Plugin {
     load() {
 
         super.deps([ 
-            ["Permission", true],
+            ["Permission", false],
             ["CorePlugin", false] 
         ]);
 
@@ -74,7 +74,8 @@ export default class WorldEdit extends Plugin {
     toggleOnWand(sender) {
 
         let itemUseOn = world.beforeEvents.itemUseOn.subscribe((arg) => {
-            if(!Permission.has(arg.source, ["Admin", "SuperAdmin", "Moderator"])) return;
+            if(super.hasDependencies(["Permission"])) if(!Permission.has(arg.source, ["Admin", "SuperAdmin", "Moderator"])) return;
+
             if(super.get_user_array("world_edit_wand_active", arg.source.id) == false) return;
 
             let block = arg.block;
@@ -102,7 +103,7 @@ export default class WorldEdit extends Plugin {
         });
 
         let playerBreakBlock = world.beforeEvents.playerBreakBlock.subscribe((arg) => {
-            if(!Permission.has(arg.player, ["Admin", "SuperAdmin", "Moderator"])) return;
+            if(super.hasDependencies(["Permission"])) if(!Permission.has(arg.player, ["Admin", "SuperAdmin", "Moderator"])) return;
             if(super.get_user_array("world_edit_wand_active", arg.player.id) == false) return;
 
             let block = arg.block;
@@ -154,7 +155,7 @@ export default class WorldEdit extends Plugin {
     }
 
     set(sender, pattern) {
-        if(!Permission.has(sender, ["SuperAdmin", "Admin", "Moderator"])) return;
+        if(super.hasDependencies(["Permission"])) if(!Permission.has(sender, ["SuperAdmin", "Admin", "Moderator"])) return;
 
         let a = super.get_user_array("world_edit_first_sel", sender.id);
         let b = super.get_user_array("world_edit_second_sel", sender.id);
@@ -221,7 +222,7 @@ export default class WorldEdit extends Plugin {
 
     //Commands Methods
     static wand(sender) {
-        if(!Permission.has(sender, ["SuperAdmin", "Admin", "Moderator"])) return;
+        if(WorldEdit.instance.hasDependencies(["Permission"])) if(!Permission.has(sender, ["SuperAdmin", "Admin", "Moderator"])) return;
 
         system.run(() => {
             let item = new ItemStack(WorldEdit.instance.wand);

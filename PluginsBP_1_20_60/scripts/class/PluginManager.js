@@ -111,6 +111,10 @@ export class PluginManager {
     }
 
     disablePlugin(plugin) {
+        if(plugin.trim().toLowerCase() == "coreplugin") {
+            world.sendMessage(Color.RED + "Can't disable CorePlugin.");
+
+        }
         let fount = false;
         for (let i = 0; i < this.plugins.length; i++) {
             const element = this.plugins[i];
@@ -145,8 +149,9 @@ export class PluginManager {
 
                 for (let i = 0; i < pluginDeps.length; i++) {
                     const dependency = pluginDeps[i][0];
+                    const shouldStop = pluginDeps[i][1];
                     console.warn("dependency: " + dependency + ": " + plugin + ": " + pluginName);
-                    if (dependency.toLowerCase() == plugin.toLowerCase()) {
+                    if (dependency.toLowerCase() == plugin.toLowerCase() && shouldStop) {
                         this.disablePlugin(pluginName);
                         //world.sendMessage(Color.RED + dependency + " is missing, be sure this plugin is installed on imports.js !");
                     }
@@ -177,6 +182,16 @@ export class PluginManager {
             }
 
         }
+    }
+
+    isPluginEnabled(plugin_) {
+        for (let i = 0; i < this.plugins.length; i++) {
+            const plugin = this.plugins[i];
+            if(plugin.name.trim().toLowerCase() == plugin_.trim().toLowerCase()) {
+                return plugin.enabled;
+            }
+        }
+        return false;
     }
 
     loadPlugin(plugin) {

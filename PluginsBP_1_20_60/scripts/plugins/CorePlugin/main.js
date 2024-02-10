@@ -21,30 +21,35 @@ export default class CorePlugin extends Plugin {
                     key: "plugin",
                     params: "",
                     tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    help: "List all plugins and show how many plugins are enabled (x). (Green are enabled, red are disabled).",
                     call: "CorePlugin.pl(sender)"
                 },
                 {
                     key: "help",
                     params: "[page: number] [plugin: string]",
                     tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    help: "Help commands, used to get every plugins commands.",
                     call: "CorePlugin.help(sender, [page], [plugin])"
                 },
                 {
                     key: "enable",
                     params: "[plugin: string]",
                     tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    help: "Enable a disabled plugin, please use /reload if you have edited imports.js after another reload or game launched.",
                     call: "CorePlugin.enable(sender, [plugin])"
                 },
                 {
                     key: "disable",
                     params: "[plugin: string]",
                     tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    help: "Disable an enabled plugin, please use /reload if you have edited imports.js after another reload or game launched.",
                     call: "CorePlugin.disable(sender, [plugin])"
                 },
                 {
                     key: "clear",
                     params: "",
                     tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    help: "Clear the chat.",
                     call: "CorePlugin.clear()"
                 }
             ],

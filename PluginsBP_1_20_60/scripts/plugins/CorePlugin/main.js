@@ -30,6 +30,18 @@ export default class CorePlugin extends Plugin {
                     call: "CorePlugin.help(sender, [page], [plugin])"
                 },
                 {
+                    key: "enable",
+                    params: "[plugin: string]",
+                    tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    call: "CorePlugin.enable(sender, [plugin])"
+                },
+                {
+                    key: "disable",
+                    params: "[plugin: string]",
+                    tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
+                    call: "CorePlugin.disable(sender, [plugin])"
+                },
+                {
                     key: "clear",
                     params: "",
                     tip: "Please type '{prefix}{key} {params}' to use correctly the commands",
@@ -40,6 +52,14 @@ export default class CorePlugin extends Plugin {
                 CorePlugin
             ]
         })
+    }
+
+    static enable(sender, plugin) {
+        system.pluginMgr.enablePlugin(plugin);
+    }
+
+    static disable(sender, plugin) {
+        system.pluginMgr.disablePlugin(plugin);
     }
 
     static pl(sender) {

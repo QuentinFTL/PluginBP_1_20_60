@@ -50,14 +50,32 @@ export class Plugin {
 
     }
 
-    commands(plugin, json_) {
+    onEnable() {
+        system.pluginMgr.commandManager.enableCommands(this.commandPrefix);
+        system.pluginMgr.enableDependencies(this.name);
 
+    }
+
+    onDisable() {
+        system.pluginMgr.commandManager.disableCommands(this.commandPrefix);
+        system.pluginMgr.disableDependencies(this.name);
+    }
+
+    commands(plugin, json_) {
+        this.commandPrefix = plugin;
         system.pluginMgr.commandManager.addJson(json_, plugin);
     }
 
     deps(deps_) {
         let misses = [];
         let shouldStop = false;
+        if(misses.length > 0) {
+            this.missingDependencies(shouldStop, misses);
+            return;
+        }
+
+        this.dependencies = deps_;
+
         for (let i = 0; i < deps_.length; i++) {
             const dependency = {
                 name: deps_[i][0],
@@ -74,9 +92,7 @@ export class Plugin {
 
             
         }
-        if(misses.length > 0) {
-            this.missingDependencies(shouldStop, misses);
-        }
+
     }
 
     missingDependencies(shouldStop, deps) {

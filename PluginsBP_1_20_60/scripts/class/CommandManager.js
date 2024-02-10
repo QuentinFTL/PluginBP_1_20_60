@@ -1,4 +1,5 @@
 import { Player, system, world } from "@minecraft/server";
+import { Color } from "./MinecraftConst";
 
 let json;
 
@@ -21,8 +22,12 @@ export class CommandManager {
         if (system.commands == null)
             system.commands = {};
 
+        if (system.active_commands == null)
+            system.active_commands = {}; 
+
         this.prefix = prefix;
         this.commands = {};
+        this.active_commands = {};
 
         this.addJson(json);
     }
@@ -30,16 +35,21 @@ export class CommandManager {
     addJson(json, pluginName = "") {
         for (let i = 0; i < json.commands.length; i++) {
             const command = json.commands[i];
+
             this.commands[command.key] = command;
-            if(pluginName != "") {
+            if (pluginName != "") {
                 this.commands[command.key].plugin = pluginName;
+                this.commands[command.key].enabled = true;
             }
+
+            this.active_commands[command.key] = this.commands[command.key];
         }
 
         if (json.registers != null) {
             for (let i = 0; i < json.registers.length; i++) {
                 const register = json.registers[i];
                 system.commands[register.name] = register;
+                system.active_commands[register.name] = register;
             }
         }
     }
@@ -293,8 +303,8 @@ export class CommandManager {
                 _params[arg.name].param.type == "double" ||
                 _params[arg.name].param.type == "int") {
                 try {
-                    if (test.toString() == "NaN" && (_params[arg.name].callParam == "" && _in == "<") ) {
-                            sender.sendMessage("§4'§1" + arg.name + "§4' hasn't a correct type ! Please use the '§1" + _params[arg.name].param.type + "§4' type !");
+                    if (test.toString() == "NaN" && (_params[arg.name].callParam == "" && _in == "<")) {
+                        sender.sendMessage("§4'§1" + arg.name + "§4' hasn't a correct type ! Please use the '§1" + _params[arg.name].param.type + "§4' type !");
                         throw new Error(arg.name + " hasn't a correct type ! Please use the '" + _params[arg.name].param.type + "' type !");
                     }
 
@@ -367,7 +377,7 @@ export class CommandManager {
 
         }
 
-        return "system.commands." + call;
+        return "system.active_commands." + call;
     }
 
     execute(sender, cmd) {
@@ -377,13 +387,14 @@ export class CommandManager {
             prefix: ""
         };*/
         let commandManager = this;
-        let params = this.parseParams(sender, this.commands[cmd.command], cmd.args);
-        let evalCode = this.parseCall(sender, this.commands[cmd.command], params);
-        eval(evalCode);
+        let params = this.parseParams(sender, this.active_commands[cmd.command], cmd.args);
+        let evalCode = this.parseCall(sender, this.active_commands[cmd.command], params);
         try {
+            eval(evalCode);
         }
         catch {
-            throw new Error(`"${cmd.command}" isn't registered !`);
+            //throw new Error(`SyntaxError: please use the following command: ${this.parseTip(this.active_commands[cmd.command], params)}`);
+            sender.sendMessage(`${Color.RED}SyntaxError: please use the following command: ${this.parseTip(this.active_commands[cmd.command], params)}`);
         }
     }
 
@@ -416,7 +427,7 @@ export class CommandManager {
     }
 
     exists(cmd) {
-        return this.commands[cmd.command] != null;
+        return this.active_commands[cmd.command] != null;
     }
 
     end() {
@@ -434,6 +445,30 @@ export class CommandManager {
             }
 
         });
+    }
+
+    enableCommands(prefix) {
+        for (let i = 0; i < Object.keys(this.commands).length; i++) {
+            const key = Object.keys(this.commands)[i];
+            const element = this.commands[key];
+            if (element.plugin == prefix) {
+                element.enabled = true;
+                this.active_commands[key] = element;
+
+            }
+        }
+    }
+
+    disableCommands(prefix) {
+        for (let i = 0; i < Object.keys(this.commands).length; i++) {
+            const key = Object.keys(this.commands)[i];
+            const element = this.commands[key];
+            if (element.plugin == prefix) {
+                element.enabled = false;
+                delete this.active_commands[key];
+
+            }
+        }
     }
 }
 
@@ -466,7 +501,7 @@ json = {
             tip: "§4Please use '{prefix}{key}' to use the command !",
             help: "This command is used to list all classes registered in the Command Manager.",
             call: "BaseCommand.Classes(sender, commandManager)"
-            
+
         }
     ],
     registers: [

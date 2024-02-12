@@ -107,6 +107,7 @@ export default class WorldEdit extends Plugin {
             if(super.get_user_array("world_edit_wand_active", arg.player.id) == false) return;
 
             let block = arg.block;
+            if(arg.itemStack == undefined) return;
             if (arg.itemStack.typeId != this.wand) {
                 return;
             }

@@ -109,7 +109,7 @@ export class Plugin {
         let has = true;
         for (let i = 0; i < deps.length; i++) {
             has = has && this.hasDependency(deps[i]);
-            console.log("has:" +has);
+            //console.log("has:" +has);
             
         }
         return has;

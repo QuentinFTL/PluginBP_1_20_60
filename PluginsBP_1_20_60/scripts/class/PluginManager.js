@@ -2,6 +2,7 @@ import { system, world } from "@minecraft/server";
 import { CommandManager } from "./CommandManager.js";
 import { Color } from "./MinecraftConst.js";
 import plugins from "../plugins.js";
+import { ChatManager } from "./ChatManager.js";
 
 
 export let dynamicProperties = {};
@@ -21,6 +22,7 @@ export class PluginManager {
     constructor() {
         this.plugins = [];
         this.plugins_num = -1;
+        this.chatManager = ChatManager.Init();
         this.commandManager = CommandManager.Init();
     }
 

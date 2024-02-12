@@ -431,20 +431,43 @@ export class CommandManager {
     }
 
     end() {
-        world.beforeEvents.chatSend.subscribe((arg) => {
-            if (arg.message.startsWith(this.prefix)) arg.cancel = true;
+        let cmdManager = this;
+        if(system.chatMgr != null) {
+            system.chatMgr.register( function(arg) {
+                if (arg.message.startsWith(cmdManager.prefix)) arg.cancel = true;
+                
+                //arg.sender = cmdManager.rewriteEngineFunction(arg.sender);
+                
+                let cmd = cmdManager.parseMessage(arg.message);
+                
+                if (arg.message.startsWith(cmdManager.prefix) && cmdManager.exists(cmd)) {
+                    
+                    
+                    cmdManager.execute(arg.sender, cmd);
+                    return true;
+                }
+                
+            });
+            system.chatMgr.end();
+        }
+        else
+        {
 
-            //arg.sender = this.rewriteEngineFunction(arg.sender);
-
-            let cmd = this.parseMessage(arg.message);
-
-            if (arg.message.startsWith(this.prefix) && this.exists(cmd)) {
-
-
-                this.execute(arg.sender, cmd);
-            }
-
-        });
+            world.beforeEvents.chatSend.subscribe((arg) => {
+                if (arg.message.startsWith(this.prefix)) arg.cancel = true;
+                
+                //arg.sender = this.rewriteEngineFunction(arg.sender);
+                
+                let cmd = this.parseMessage(arg.message);
+                
+                if (arg.message.startsWith(this.prefix) && this.exists(cmd)) {
+                    
+                    
+                    this.execute(arg.sender, cmd);
+                }
+                
+            });
+        }
     }
 
     enableCommands(prefix) {
